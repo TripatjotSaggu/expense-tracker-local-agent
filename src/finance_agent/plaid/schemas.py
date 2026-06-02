@@ -18,6 +18,30 @@ class ExchangePublicTokenRequest(BaseModel):
 
 
 class ExchangePublicTokenResponse(BaseModel):
-    access_token: str
     item_id: str
     request_id: str | None = None
+    accounts_persisted: int = 0
+
+
+class ItemRecord(BaseModel):
+    item_id: str
+    institution_id: str | None = None
+    institution_name: str | None = None
+    created_at: str
+    updated_at: str
+
+
+class AccountRecord(BaseModel):
+    account_id: str
+    item_id: str
+    name: str
+    official_name: str | None = None
+    mask: str | None = None
+    type: str | None = None
+    subtype: str | None = None
+    current_balance: float | None = None
+    available_balance: float | None = None
+    iso_currency_code: str | None = None
+    credit_limit: float | None = None
+    created_at: str
+    updated_at: str

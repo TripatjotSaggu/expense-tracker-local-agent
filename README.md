@@ -71,6 +71,10 @@ The API will start on `http://127.0.0.1:8000` with:
 - `GET /health`
 - `POST /api/plaid/link-token/create`
 - `POST /api/plaid/exchange-public-token`
+- `GET /api/plaid/items`
+- `GET /api/plaid/accounts`
+
+Linked Plaid items and account metadata are stored locally in `finance_agent.db`.
 
 If your bank export uses different column names, map them at the CLI:
 
@@ -107,3 +111,4 @@ If your export does not include `account` or `category`, the CLI can fill them w
 - Keep your CSV files local if you want a fully local workflow
 - The sample analytics treats `Savings` transfers separately so they do not inflate spending
 - Plaid data retrieval is handled by the local FastAPI backend, while LLM inference stays local
+- Plaid access tokens and account metadata are persisted locally in SQLite for development

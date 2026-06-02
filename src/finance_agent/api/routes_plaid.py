@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException
 
 from finance_agent.plaid.schemas import (
+    AccountRecord,
     ExchangePublicTokenRequest,
     ExchangePublicTokenResponse,
+    ItemRecord,
     LinkTokenCreateRequest,
     LinkTokenCreateResponse,
 )
@@ -32,3 +34,21 @@ def exchange_public_token(payload: ExchangePublicTokenRequest) -> ExchangePublic
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Plaid public token exchange failed: {exc}") from exc
+
+
+@router.get("/items", response_model=list[ItemRecord])
+def list_items() -> list[ItemRecord]:
+    try:
+        service = PlaidService()
+        return service.list_items()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Unable to list Plaid items: {exc}") from exc
+
+
+@router.get("/accounts", response_model=list[AccountRecord])
+def list_accounts() -> list[AccountRecord]:
+    try:
+        service = PlaidService()
+        return service.list_accounts()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Unable to list Plaid accounts: {exc}") from exc
