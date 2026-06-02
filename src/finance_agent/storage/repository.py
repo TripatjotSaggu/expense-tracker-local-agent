@@ -3,6 +3,11 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from finance_agent.storage.db import get_connection
+from finance_agent.storage.keychain import (
+    TOKEN_PLACEHOLDER,
+    get_access_token,
+    store_access_token,
+)
 from finance_agent.storage.models import Account, PlaidItem
 
 
@@ -13,28 +18,45 @@ def _now_iso() -> str:
 class PlaidRepository:
     def upsert_item(self, item: PlaidItem) -> None:
         now = _now_iso()
+        token_storage_key = store_access_token(item.item_id, item.access_token)
         with get_connection() as connection:
             connection.execute(
                 """
                 INSERT INTO plaid_items (
-                    item_id, access_token, institution_id, institution_name, created_at, updated_at
+                    item_id, access_token, token_storage_key, institution_id, institution_name, created_at, updated_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(item_id) DO UPDATE SET
                     access_token = excluded.access_token,
+                    token_storage_key = excluded.token_storage_key,
                     institution_id = excluded.institution_id,
                     institution_name = excluded.institution_name,
                     updated_at = excluded.updated_at
                 """,
                 (
                     item.item_id,
-                    item.access_token,
+                    TOKEN_PLACEHOLDER,
+                    token_storage_key,
                     item.institution_id,
                     item.institution_name,
                     item.created_at,
                     now,
                 ),
             )
+
+    def get_access_token(self, item_id: str) -> str:
+        with get_connection() as connection:
+            row = connection.execute(
+                """
+                SELECT token_storage_key
+                FROM plaid_items
+                WHERE item_id = ?
+                """,
+                (item_id,),
+            ).fetchone()
+        if row is None or not row["token_storage_key"]:
+            raise KeyError(f"No stored Plaid token found for item_id={item_id}")
+        return get_access_token(row["token_storage_key"])
 
     def upsert_accounts(self, accounts: list[Account]) -> None:
         if not accounts:
@@ -86,7 +108,7 @@ class PlaidRepository:
         with get_connection() as connection:
             rows = connection.execute(
                 """
-                SELECT item_id, access_token, institution_id, institution_name, created_at, updated_at
+                SELECT item_id, access_token, token_storage_key, institution_id, institution_name, created_at, updated_at
                 FROM plaid_items
                 ORDER BY created_at DESC
                 """

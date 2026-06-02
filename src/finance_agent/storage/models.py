@@ -12,7 +12,8 @@ def _now_iso() -> str:
 @dataclass(frozen=True)
 class PlaidItem:
     item_id: str
-    access_token: str
+    access_token: str = ""
+    token_storage_key: str | None = None
     institution_id: str | None = None
     institution_name: str | None = None
     created_at: str = field(default_factory=_now_iso)
@@ -21,6 +22,7 @@ class PlaidItem:
     def to_record(self) -> dict[str, Any]:
         return {
             "item_id": self.item_id,
+            "token_storage_key": self.token_storage_key,
             "institution_id": self.institution_id,
             "institution_name": self.institution_name,
             "created_at": self.created_at,

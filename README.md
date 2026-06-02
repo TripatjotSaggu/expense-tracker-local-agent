@@ -157,4 +157,5 @@ If your export does not include `account` or `category`, the CLI can fill them w
 - Keep your CSV files local if you want a fully local workflow
 - The sample analytics treats `Savings` transfers separately so they do not inflate spending
 - Plaid data retrieval is handled by the local FastAPI backend, while LLM inference stays local
-- Plaid access tokens and account metadata are persisted locally in SQLite for development
+- Plaid account metadata is persisted locally in SQLite for development
+- Plaid access tokens are stored in macOS Keychain instead of plain SQLite
