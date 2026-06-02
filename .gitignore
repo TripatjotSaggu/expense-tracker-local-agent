@@ -6,3 +6,4 @@ dist/
 build/
 *.pyc
 *.db
+*.egg-info/

@@ -8,7 +8,6 @@ from finance_agent.config import get_settings
 
 ENVIRONMENT_MAP = {
     "sandbox": plaid.Environment.Sandbox,
-    "development": plaid.Environment.Development,
     "production": plaid.Environment.Production,
 }
 
