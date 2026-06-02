@@ -5,6 +5,7 @@ import uvicorn
 
 from finance_agent.api.routes_health import router as health_router
 from finance_agent.api.routes_plaid import router as plaid_router
+from finance_agent.api.routes_ui import router as ui_router
 from finance_agent.storage.db import initialize_database
 
 
@@ -21,6 +22,7 @@ def create_app() -> FastAPI:
         description="Local backend for Plaid ingestion and local LLM summaries.",
         lifespan=lifespan,
     )
+    app.include_router(ui_router)
     app.include_router(health_router)
     app.include_router(plaid_router)
     return app
