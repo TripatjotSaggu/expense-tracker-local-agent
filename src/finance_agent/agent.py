@@ -40,3 +40,30 @@ Please do all of the following:
         temperature=0.2,
     )
     return response.choices[0].message.content or ""
+
+
+def summarize_linked_accounts(summary_payload: dict) -> str:
+    settings = get_settings()
+    client = get_client()
+
+    user_prompt = f"""Here is a computed account and balance summary in JSON.
+
+{json.dumps(summary_payload, indent=2)}
+
+Please do all of the following:
+1. Summarize the linked account setup in simple language.
+2. Comment on the current credit balances and any available credit utilization signal.
+3. Point out any risks or things to watch.
+4. Give 3 practical suggestions based only on the available account and balance data.
+5. Be explicit that this is based on linked accounts and balances, not full transaction history.
+"""
+
+    response = client.chat.completions.create(
+        model=settings.local_llm_model,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt},
+        ],
+        temperature=0.2,
+    )
+    return response.choices[0].message.content or ""

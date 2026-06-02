@@ -106,6 +106,7 @@ The API will start on `http://127.0.0.1:8000` with:
 - `POST /api/plaid/exchange-public-token`
 - `GET /api/plaid/items`
 - `GET /api/plaid/accounts`
+- `GET /api/summary/accounts`
 
 Linked Plaid items and account metadata are stored locally in `finance_agent.db`.
 
@@ -121,6 +122,7 @@ That page will:
 - open Plaid Link in the browser
 - exchange the returned `public_token` with your local backend
 - show linked items and accounts already stored locally
+- let you generate local LLM insights from linked account and balance data
 
 If your bank export uses different column names, map them at the CLI:
 

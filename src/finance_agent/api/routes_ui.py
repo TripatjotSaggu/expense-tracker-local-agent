@@ -149,6 +149,7 @@ HTML_PAGE = """<!DOCTYPE html>
         <div class="row">
           <button id="connect-btn">Connect with Plaid</button>
           <button id="refresh-btn" class="secondary" type="button">Refresh linked accounts</button>
+          <button id="insights-btn" class="secondary" type="button">Generate account insights</button>
         </div>
         <p class="muted">
           After successful linking, this page will exchange the returned public token with your local backend automatically.
@@ -168,6 +169,10 @@ HTML_PAGE = """<!DOCTYPE html>
           <h2>Linked accounts</h2>
           <pre id="accounts-output">No accounts loaded yet.</pre>
         </article>
+        <article class="card">
+          <h2>LLM account insights</h2>
+          <pre id="insights-output">No account insights yet.</pre>
+        </article>
       </section>
     </main>
 
@@ -175,8 +180,10 @@ HTML_PAGE = """<!DOCTYPE html>
       const actionOutput = document.getElementById("action-output");
       const itemsOutput = document.getElementById("items-output");
       const accountsOutput = document.getElementById("accounts-output");
+      const insightsOutput = document.getElementById("insights-output");
       const connectBtn = document.getElementById("connect-btn");
       const refreshBtn = document.getElementById("refresh-btn");
+      const insightsBtn = document.getElementById("insights-btn");
       const clientUserIdInput = document.getElementById("client-user-id");
 
       function showJson(element, value) {
@@ -266,8 +273,22 @@ HTML_PAGE = """<!DOCTYPE html>
         }
       }
 
+      async function generateAccountInsights() {
+        insightsBtn.disabled = true;
+        showJson(insightsOutput, "Generating local LLM account insights...");
+        try {
+          const data = await fetchJson("/api/summary/accounts");
+          showJson(insightsOutput, data);
+        } catch (error) {
+          showJson(insightsOutput, `Account insights failed: ${error.message}`);
+        } finally {
+          insightsBtn.disabled = false;
+        }
+      }
+
       connectBtn.addEventListener("click", startPlaidLink);
       refreshBtn.addEventListener("click", refreshLinkedData);
+      insightsBtn.addEventListener("click", generateAccountInsights);
       refreshLinkedData();
     </script>
   </body>
