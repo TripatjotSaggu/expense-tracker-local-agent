@@ -29,13 +29,18 @@ class PlaidService:
         self.repository = PlaidRepository()
 
     def create_link_token(self, payload: LinkTokenCreateRequest) -> LinkTokenCreateResponse:
-        request = PlaidLinkTokenCreateRequest(
+        request_kwargs = dict(
             user=LinkTokenCreateRequestUser(client_user_id=payload.client_user_id),
             client_name=payload.client_name,
             products=[Products(product) for product in self.settings.plaid_products],
             country_codes=[CountryCode(code) for code in self.settings.plaid_country_codes],
             language=payload.language,
-            redirect_uri=self.settings.plaid_redirect_uri,
+        )
+        if self.settings.plaid_redirect_uri:
+            request_kwargs["redirect_uri"] = self.settings.plaid_redirect_uri
+
+        request = PlaidLinkTokenCreateRequest(
+            **request_kwargs,
         )
         response = self.client.link_token_create(request)
         data = response.to_dict()
